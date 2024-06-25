@@ -4,16 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-
 import se.umu.alro0113.thirtygame.databinding.ActivityGameBinding
 
 /* This activity is the entry point of the application
@@ -28,17 +24,11 @@ private const val MAX_THROWS_PER_ROUND = 3
 
 class GameActivity : AppCompatActivity() {
     private lateinit var model : GameModel
-    private lateinit var btnThrow : Button
-    private lateinit var btnConfirmRound : Button
-    private lateinit var btnConfirmSpinnerSelection : Button
-    private lateinit var spinner : Spinner
-    private lateinit var arrayAdapter : ArrayAdapter<String>
-    private lateinit var diceImageViews: List<ImageView>
-    private lateinit var yourChoice: TextView
-    private lateinit var currentRoundTextView : TextView
-
     private lateinit var binding: ActivityGameBinding
 
+    private lateinit var diceImageViews: List<ImageView>
+
+    private lateinit var arrayAdapter : ArrayAdapter<String>
     private var throwCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,13 +44,6 @@ class GameActivity : AppCompatActivity() {
         binding = ActivityGameBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
-        btnThrow = binding.throwBtn
-        btnConfirmRound = binding.confirmBtn
-        btnConfirmSpinnerSelection = binding.confirmSpinnerSelectionBtn
-        spinner = binding.choicesSpn
-        currentRoundTextView = binding.round
-        yourChoice = binding.yourChoice
 
         diceImageViews = listOf(
             binding.dice1,
@@ -83,11 +66,11 @@ class GameActivity : AppCompatActivity() {
             model.setDice(dice) // update restored model with restored dice
 
             // Restore game state
-            btnThrow.isEnabled = savedInstanceState.getBoolean("btnThrow")
-            btnConfirmRound.isEnabled = savedInstanceState.getBoolean("btnConfirmRound")
-            btnConfirmSpinnerSelection.isEnabled = savedInstanceState.getBoolean("btnConfirmSpinnerSelection")
-            spinner.isEnabled = savedInstanceState.getBoolean("spinner")
-            yourChoice.visibility = savedInstanceState.getInt("yourChoice")
+            binding.throwBtn.isEnabled = savedInstanceState.getBoolean("btnThrow")
+            binding.confirmBtn.isEnabled = savedInstanceState.getBoolean("btnConfirmRound")
+            binding.confirmSpinnerSelectionBtn.isEnabled = savedInstanceState.getBoolean("btnConfirmSpinnerSelection")
+            binding.choicesSpn.isEnabled = savedInstanceState.getBoolean("spinner")
+            binding.yourChoice.visibility = savedInstanceState.getInt("yourChoice")
             throwCounter = savedInstanceState.getInt("throwCounter")
 
             restoreUI() // restore user interface
@@ -97,43 +80,43 @@ class GameActivity : AppCompatActivity() {
             model.setDice(MutableList(6) { Die() })
 
             // initial state of application
-            spinner.isEnabled = false
-            btnThrow.isEnabled = true
-            btnConfirmRound.isEnabled= false
-            btnConfirmSpinnerSelection.isEnabled = false
-            yourChoice.visibility = View.VISIBLE
-            yourChoice.text = resources.getString(R.string.choice_text, model.getCurrentChoice())
+            binding.choicesSpn.isEnabled = false
+            binding.throwBtn.isEnabled = true
+            binding.confirmBtn.isEnabled= false
+            binding.confirmSpinnerSelectionBtn.isEnabled = false
+            binding.yourChoice.visibility = View.VISIBLE
+            binding.yourChoice.text = resources.getString(R.string.choice_text, model.getCurrentChoice())
         }
 
         // Initial setup of spinner, based on saved or new GameModel object
         arrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, model.getChoices())
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = arrayAdapter
+        binding.choicesSpn.adapter = arrayAdapter
 
         // Sets up 6 handlers for toggling die state and views from white to red/gray, or red/gray to white
         setDieTogglingListeners()
 
         // Responsible for both rolling all dice or re-rolling particular dice
-        btnThrow.setOnClickListener{
+        binding.throwBtn.setOnClickListener{
             if(throwCounter == 1 || throwCounter == 2){
                 model.rollSelectedDice()
             } else {
-                spinner.isEnabled = true
-                btnConfirmSpinnerSelection.isEnabled = true
+                binding.choicesSpn.isEnabled = true
+                binding.confirmSpinnerSelectionBtn.isEnabled = true
                 model.rollAllDice()
             }
             model.clearSelectedDice()
             throwCounter++
-            updateDieImageViewsOnThrow()
+            setWhiteDice()
             if(throwCounter == MAX_THROWS_PER_ROUND){
-                btnThrow.isEnabled = false
+                binding.throwBtn.isEnabled = false
             }
         }
 
         // Responsible for ending a round and starting a new one
-        btnConfirmRound.setOnClickListener{
-            yourChoice.visibility = View.INVISIBLE
-            spinner.isEnabled = false
+        binding.confirmBtn.setOnClickListener{
+            binding.yourChoice.visibility = View.INVISIBLE
+            binding.choicesSpn.isEnabled = false
             val theChoice = model.getCurrentChoice()
 
             // handle updating score for "low" or 4-12, depending on selectedRed die configuration and choice
@@ -141,16 +124,15 @@ class GameActivity : AppCompatActivity() {
                 model.updateScoresAndRound()
                 model.clearSelectedDice()
                 restoreUI()
-                btnThrow.isEnabled = true
-                btnConfirmRound.isEnabled = false
+                binding.throwBtn.isEnabled = true
+                binding.confirmBtn.isEnabled = false
             } else {
                 if(model.assertValidDieConfig()){ // first control that the selected dice are viable
                     model.updateScoresAndRound()
                     model.clearSelectedDice()
                     restoreUI()
-                    btnThrow.isEnabled = true
-                    btnConfirmRound.isEnabled = false
-                    //btnConfirmSpinnerSelection.isEnabled = true
+                    binding.throwBtn.isEnabled = true
+                    binding.confirmBtn.isEnabled = false
                 } else {
                     Toast.makeText(this, "Invalid die configuration for chosen score, try selecting other dice", Toast.LENGTH_LONG).show()
                 }
@@ -168,18 +150,20 @@ class GameActivity : AppCompatActivity() {
         }
 
         // Responsible for recreating adapter with one less item
-        btnConfirmSpinnerSelection.setOnClickListener{
-            yourChoice.visibility = View.VISIBLE
-            val selection : String = spinner.selectedItem.toString()
+        binding.confirmSpinnerSelectionBtn.setOnClickListener{
+            model.clearSelectedDice()
+            setWhiteDice()
+            binding.yourChoice.visibility = View.VISIBLE
+            val selection : String = binding.choicesSpn.selectedItem.toString()
             model.onSpinnerConfirmed(selection)
-            spinner.isEnabled = false
-            btnConfirmSpinnerSelection.isEnabled = false
-            btnThrow.isEnabled = false
-            btnConfirmRound.isEnabled = true
-            yourChoice.text = resources.getString(R.string.choice_text, model.getCurrentChoice())
+            binding.choicesSpn.isEnabled = false
+            binding.confirmSpinnerSelectionBtn.isEnabled = false
+            binding.throwBtn.isEnabled = false
+            binding.confirmBtn.isEnabled = true
+            binding.yourChoice.text = resources.getString(R.string.choice_text, model.getCurrentChoice())
             arrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, model.getChoices())
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = arrayAdapter
+            binding.choicesSpn.adapter = arrayAdapter
         }
     }
 
@@ -199,11 +183,11 @@ class GameActivity : AppCompatActivity() {
         // GameActivity
         outState.putInt("throwCounter", throwCounter)
 
-        outState.putBoolean("btnThrow", btnThrow.isEnabled)
-        outState.putBoolean("btnConfirmRound", btnConfirmRound.isEnabled)
-        outState.putBoolean("btnConfirmSpinnerSelection", btnConfirmSpinnerSelection.isEnabled)
-        outState.putBoolean("spinner", spinner.isEnabled)
-        outState.putInt("yourChoice", yourChoice.visibility)
+        outState.putBoolean("btnThrow", binding.throwBtn.isEnabled)
+        outState.putBoolean("btnConfirmRound", binding.confirmBtn.isEnabled)
+        outState.putBoolean("btnConfirmSpinnerSelection", binding.confirmSpinnerSelectionBtn.isEnabled)
+        outState.putBoolean("spinner", binding.choicesSpn.isEnabled)
+        outState.putInt("yourChoice", binding.yourChoice.visibility)
     }
 
     // Set 6 image views, 1 round textview, 1 choice textview.
@@ -249,7 +233,7 @@ class GameActivity : AppCompatActivity() {
         }
 
         // set the text view that shows the current choice
-        yourChoice.text = resources.getString(R.string.choice_text, model.getCurrentChoice())
+        binding.yourChoice.text = resources.getString(R.string.choice_text, model.getCurrentChoice())
 
         // set the textview that shows the current round
         val resId = when (model.getRound()) {
@@ -266,11 +250,11 @@ class GameActivity : AppCompatActivity() {
 
             else -> R.drawable.white1
         }
-        currentRoundTextView.setText(resId)
+        binding.round.setText(resId)
     }
 
     // helper for btnThrow listeners. Sets 6 die image views with white dice with correct values from the model
-    private fun updateDieImageViewsOnThrow() {
+    private fun setWhiteDice() {
         val dice = model.getDice()
         dice.forEachIndexed { index, die ->
             val resId = when (die.value) {
@@ -295,7 +279,7 @@ class GameActivity : AppCompatActivity() {
                 val resId : Int
 
                 // Based on current game state, toggle the selection state of a die at index in models list of die
-                val rethrowing : Boolean = spinner.isEnabled
+                val rethrowing : Boolean = binding.choicesSpn.isEnabled
                 if(rethrowing){
                     model.toggleSelectedGray(index)
                 } else {

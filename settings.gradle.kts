@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ThirtyGame"
+rootProject.name = "ThirtyGameKotlin"
 include(":app")
