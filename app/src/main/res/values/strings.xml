@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">ThirtyGame</string>
+    <string name="throw_btn">Throw/Rethrow</string>
+    <string name="confirm_btn">Confirm the chosen dice/Low for score evaluation</string>
+    <string name="confirm_spinnerSelectionBtn">Confirm the spinners currently selected value</string>
+
+    <string name="round1">Round: 1</string>
+    <string name="round2">Round: 2</string>
+    <string name="round3">Round: 3</string>
+    <string name="round4">Round: 4</string>
+    <string name="round5">Round: 5</string>
+    <string name="round6">Round: 6</string>
+    <string name="round7">Round: 7</string>
+    <string name="round8">Round: 8</string>
+    <string name="round9">Round: 9</string>
+    <string name="round10">Round: 10</string>
+    <string name="choice_text">Your choice: %1$s. If Low, simply press Confirm. Otherwise, select dice.</string>
+
+
+    <string name="choice1Score">score for pick %1$s : %2$s</string>
+    <string name="choice2Score">score for pick %1$s : %2$s</string>
+    <string name="choice3Score">score for pick %1$s : %2$s</string>
+    <string name="choice4Score">score for pick %1$s : %2$s</string>
+    <string name="choice5Score">score for pick %1$s : %2$s</string>
+    <string name="choice6Score">score for pick %1$s : %2$s</string>
+    <string name="choice7Score">score for pick %1$s : %2$s</string>
+    <string name="choice8Score">score for pick %1$s : %2$s</string>
+    <string name="choice9Score">score for pick %1$s : %2$s</string>
+    <string name="choice10Score">score for pick %1$s : %2$s</string>
+    <string name="totalScore">Tot %1$s</string>
+
+</resources>
+
+
