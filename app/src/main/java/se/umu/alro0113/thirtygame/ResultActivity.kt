@@ -2,12 +2,15 @@ package se.umu.alro0113.thirtygame
 
 /* This activity simply presents the total score and scores for each selection made during the game */
 
+
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import se.umu.alro0113.thirtygame.databinding.ActivityResultBinding
+
 
 class ResultActivity : AppCompatActivity() {
     private lateinit var totalscore: TextView
@@ -23,6 +26,9 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var choice10Score : TextView
     private lateinit var model : GameModel
 
+    private lateinit var binding: ActivityResultBinding
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,17 +39,21 @@ class ResultActivity : AppCompatActivity() {
             insets
         }
 
-        totalscore = findViewById(R.id.totalScore)
-        choice1Score = findViewById(R.id.round1Score)
-        choice2Score = findViewById(R.id.round2Score)
-        choice3Score = findViewById(R.id.round3Score)
-        choice4Score = findViewById(R.id.round4Score)
-        choice5Score = findViewById(R.id.round5Score)
-        choice6Score = findViewById(R.id.round6Score)
-        choice7Score = findViewById(R.id.round7Score)
-        choice8Score = findViewById(R.id.round8Score)
-        choice9Score = findViewById(R.id.round9Score)
-        choice10Score = findViewById(R.id.round10Score)
+        binding = ActivityResultBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        totalscore = binding.totalScore
+        choice1Score = binding.round1Score
+        choice2Score = binding.round2Score
+        choice3Score = binding.round3Score
+        choice4Score = binding.round4Score
+        choice5Score = binding.round5Score
+        choice6Score = binding.round6Score
+        choice7Score = binding.round7Score
+        choice8Score = binding.round8Score
+        choice9Score = binding.round9Score
+        choice10Score = binding.round10Score
 
         model = if(savedInstanceState != null){
             savedInstanceState.getParcelable("model")!!

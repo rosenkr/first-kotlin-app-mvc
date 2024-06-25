@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+import se.umu.alro0113.thirtygame.databinding.ActivityGameBinding
+
 /* This activity is the entry point of the application
 *  Game state is controlled internally by a looping integer throwCounter
 *  and by toggling the enabled state for 3 buttons and 1 spinner.
@@ -34,6 +36,9 @@ class GameActivity : AppCompatActivity() {
     private lateinit var diceImageViews: List<ImageView>
     private lateinit var yourChoice: TextView
     private lateinit var currentRoundTextView : TextView
+
+    private lateinit var binding: ActivityGameBinding
+
     private var throwCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,19 +51,24 @@ class GameActivity : AppCompatActivity() {
             insets
         }
 
-        btnThrow = findViewById(R.id.throw_btn)
-        btnConfirmRound = findViewById(R.id.confirm_btn)
-        btnConfirmSpinnerSelection = findViewById(R.id.confirm_spinnerSelectionBtn)
-        spinner = findViewById(R.id.choices_spn)
-        currentRoundTextView = findViewById(R.id.round)
-        yourChoice = findViewById(R.id.yourChoice)
+        binding = ActivityGameBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        btnThrow = binding.throwBtn
+        btnConfirmRound = binding.confirmBtn
+        btnConfirmSpinnerSelection = binding.confirmSpinnerSelectionBtn
+        spinner = binding.choicesSpn
+        currentRoundTextView = binding.round
+        yourChoice = binding.yourChoice
+
         diceImageViews = listOf(
-            findViewById(R.id.dice1),
-            findViewById(R.id.dice2),
-            findViewById(R.id.dice3),
-            findViewById(R.id.dice4),
-            findViewById(R.id.dice5),
-            findViewById(R.id.dice6)
+            binding.dice1,
+            binding.dice2,
+            binding.dice3,
+            binding.dice4,
+            binding.dice5,
+            binding.dice6
         )
 
         if(savedInstanceState != null){
